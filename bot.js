@@ -170,7 +170,7 @@ bot.on('guildMemberAdd', (member) => {
       if (err) throw err;
       console.log(JSON.stringify(data, null, 2));
     });
-    bot.channels.get("297408095137562625").sendMessage(`${member}, your data have been saved. Welcome!`);
+    // bot.channels.get("297408095137562625").sendMessage(`${member}, your data have been saved. Welcome!`);
 });
 
 function showData(msg, user, type){
