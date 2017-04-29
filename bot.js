@@ -109,36 +109,45 @@ const commands = {
 }, 2000);
 },
   '/undo' : (msg) => {
-    var user = msg.mentions.users().first;
-    var id = msg.mentions.users.first().id,
-    dir = ("./users/" + id + ".json"),
-    dirobj = require(dir);
+    var user, id;
+    try {
+    user = msg.mentions.users.first;
+    id = msg.mentions.users.first().id;
+  } catch (e) {
+    if (!user || !id) return msg.channel.sendMessage("Please specify the member you want to clear their last reputation change.");
+  }
     var _flag = false;
-    msg.member.roles.filter( (role) => {
-      if(role.name == "Staff Member"){
+   msg.member.roles.filter( (role) => {
+      console.log(role.name);
+      if(role.name == "Staff member"){
         _flag = true;
-      }
-      if (_flag === false) return msg.channel.sendMessage("You do not have permission to issue this command!");
+      }});
 
-      let type = dirobj.last;
+      if (_flag === false) return msg.channel.sendMessage("You do not have permission to issue this command!");
+      //console.log(id);
+      var dir = ("./users/" + id + ".json");
+      var dirobj = require(dir);
+      let type = dirobj.last[dirobj.last.length - 1];
+
       if (type === "plus"){
-        dirobj.plus = dirobj.plus - 1;
+        dirobj["plus"] = dirobj["plus"] - 1;
       } else if (type === "minus") {
-        dirobj.minus = dirobj.minus - 1;
+        dirobj["minus"] = dirobj["minus"] - 1;
       } else {
         return;
       }
+      dirobj["last"] = dirobj["last"].slice(0, -1);
+      dirobj["feedback"] = dirobj["feedback"].slice(0, -1);
 
-      dirobj.last.slice(-1);
-      dirobj.feedback.slice(-1);
-    });
+      user = msg.mentions.users.first();
+      console.log(user.id);
 
-    fs.writeFile((dir, JSON.stringify(dirobj, null, 2), (err) => {
-      if (err) throw err;
-      console.log(JSON.stringify(dirobj, null, 2));
-    }));
+      fs.writeFile((`./users/${user.id}.json`), JSON.stringify(dirobj, null, 2), (err) => {
+        if (err) return console.error(err);
+        console.log(JSON.stringify(dirobj, null, 2));
+      });
 
-    showData(msg, user, 'check');
+      showData(msg, user, 'check');
   }
 };
 bot.on('ready', () => {
