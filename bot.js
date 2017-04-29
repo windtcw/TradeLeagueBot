@@ -21,6 +21,7 @@ const commands = {
       console.log(file);
       file["plus"] = file["plus"] + 1;
       file["feedback"].push(feedback);
+      file["last"].push("plus");
 
       fs.writeFile(("./users/" + user.id + ".json"), JSON.stringify(file, null, 2), (err) => {
         if (err) throw err;
@@ -46,6 +47,7 @@ const commands = {
     console.log(file);
     file["minus"] = file["minus"] + 1;
     file["feedback"].push(feedback);
+    file["last"].push("minus");
 
   fs.writeFile(("./users/" + user.id + ".json"), JSON.stringify(file, null, 2), (err) => {
     if (err) throw err;
@@ -76,7 +78,8 @@ const commands = {
           "name" : (`${keyarr[i].user.username}`),
           "plus" : 0,
           "minus" : 0,
-          "feedback" : [p,p,p,p,p]
+          "feedback" : [p,p,p,p,p],
+          "last" : []
         };
         fs.writeFile((`./users/${arr[i]}.json`), JSON.stringify(data, null, 2), (err) => {
           if (err) throw err;
@@ -104,8 +107,39 @@ const commands = {
     { disableEveryone: true }
   );
 }, 2000);
-}
+},
+  '/undo' : (msg) => {
+    var user = msg.mentions.users().first;
+    var id = msg.mentions.users.first().id,
+    dir = ("./users/" + id + ".json"),
+    dirobj = require(dir);
+    var _flag = false;
+    msg.member.roles.filter( (role) => {
+      if(role.name == "Staff Member"){
+        _flag = true;
+      }
+      if (_flag === false) return msg.channel.sendMessage("You do not have permission to issue this command!");
 
+      let type = dirobj.last;
+      if (type === "plus"){
+        dirobj.plus = dirobj.plus - 1;
+      } else if (type === "minus") {
+        dirobj.minus = dirobj.minus - 1;
+      } else {
+        return;
+      }
+
+      dirobj.last.slice(-1);
+      dirobj.feedback.slice(-1);
+    });
+
+    fs.writeFile((dir, JSON.stringify(dirobj, null, 2), (err) => {
+      if (err) throw err;
+      console.log(JSON.stringify(dirobj, null, 2));
+    }));
+
+    showData(msg, user, 'check');
+  }
 };
 bot.on('ready', () => {
   console.log("READY!");
@@ -120,7 +154,8 @@ bot.on('guildMemberAdd', (member) => {
       "name" : (`${member.user.username}`),
       "plus" : 0,
       "minus" : 0,
-      "feedback" : [p,p,p,p,p]
+      "feedback" : [p,p,p,p,p],
+      "last" : []
     };
     fs.writeFile((`./users/${member.id}.json`), JSON.stringify(data, null, 2), (err) => {
       if (err) throw err;
