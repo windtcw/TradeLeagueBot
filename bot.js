@@ -1,22 +1,57 @@
 'use strict';
 
+
+/*
+========= TO LEGACYY ==========
+
+Please update the Discord.js module
+to its latest version!
+
+run:
+
+npm install discord.js --save
+===============================
+*/
+
 const Discord = require('discord.js'),
 bot = new Discord.Client(),
 fs = require('fs'),
 datadir = "./users";
+// )
 
 bot.login('MzA2NTYwODk1NTA3NjI4MDQy.C-Fimg.6Ckvl7SCiBSUK8SNHIITJruDQpc');
 
+const sudo = {
+  '--massundo' : (m) => {
+    var _flag = false;
+    m.member.roles.filter( (role) => {
+      console.log(role.name);
+      if(role.name == "Staff member"){
+        _flag = true;
+      }});
+    if (_flag == false) return m.channel.send("Sudo Commands limited to Staffs only.");
+    
+    let user = m.mentions.users.first();
+    if (!user) return m.channel.send("Please specify the target user by a mention.");
+    let arr = m.content.split(" ").slice(3);
+    if (!arr) return m.channel.send("Please specify the amount of undos");
+    if (isInt(arr) === false) return m.channel.send("That's not an integer.");
+    for (var i = 0; i < arr; i++){
+    commands['/undo'](m);
+  }
+    showData(m, user, 'check');
+  }
+};
 const commands = {
   '+rep' : (msg) => {
     try{
     let arr = msg.content.split(" ").slice(1);
-    if (!arr[0]) return msg.channel.sendMessage("Please specify the target user by a mention.");
+    if (!arr[0]) return msg.channel.send("Please specify the target user by a mention.");
     let feedback = arr.join(" ").split(" ").slice(1).join(" ");
     if (!feedback) feedback = "None.";
 
     let user = msg.mentions.users.first();
-    if (user.id == msg.author.id) return msg.channel.sendMessage(`${msg.author}, you can't add a reputation point to yourself.`);
+    if (user.id == msg.author.id) return msg.channel.send(`${msg.author}, you can't add a reputation point to yourself.`);
       var file = require("./users/" + user.id + ".json");
       console.log(file);
       file["plus"] = file["plus"] + 1;
@@ -30,19 +65,19 @@ const commands = {
 
       showData(msg, user, 'plus');
     } catch (e) {
-      msg.channel.sendMessage("A problem occured while processing. Did you make any mistakes typing the command?");
+      msg.channel.send("A problem occured while processing. Did you make any mistakes typing the command?");
       console.error(e);
     }
     },
   '-rep' : (msg) => {
     try{
     let arr = msg.content.split(" ").slice(1);
-    if (!arr[0]) return msg.channel.sendMessage("Please specify the target user by a mention.");
+    if (!arr[0]) return msg.channel.send("Please specify the target user by a mention.");
     let feedback = arr.join(" ").split(" ").slice(1).join(" ");
     if (!feedback) feedback = "None.";
 
     let user = msg.mentions.users.first();
-    if (user.id == msg.author.id) return msg.channel.sendMessage(`${msg.author}, you can't deduce a reputation point from yourself.`);
+    if (user.id == msg.author.id) return msg.channel.send(`${msg.author}, you can't deduce a reputation point from yourself.`);
     var file = require("./users/" + user.id + ".json");
     console.log(file);
     file["minus"] = file["minus"] + 1;
@@ -56,19 +91,19 @@ const commands = {
 
   showData(msg, user, 'minus');
 } catch (e) {
-  msg.channel.sendMessage("A problem occured while processing. Did you make any mistakes typing the command?");
+  msg.channel.send("A problem occured while processing. Did you make any mistakes typing the command?");
   console.error(e);
 }
   },
   '!rep' : (msg) => {
     let user = msg.mentions.users.first();
-    if (!user) return msg.channel.sendMessage("Please specify the target user by a mention.");
+    if (!user) return msg.channel.send("Please specify the target user by a mention.");
     showData(msg, user, 'check');
   },
   '/dataflush' : (msg) => {
     var i = 0,
     j = 0;
-    if (msg.author.id != 197733648403791872) return msg.channel.sendMessage("Command limited to bot owner only.");
+    if (msg.author.id != 197733648403791872) return msg.channel.send("Command limited to bot owner only.");
     msg.guild.fetchMembers().then((guild) => {
       var arr = guild.members.keyArray();
       var p = ".";
@@ -102,19 +137,20 @@ const commands = {
     .setTimestamp()
     .addField('\u200b', (`Logged \`\`\`${j}\`\`\` users.`));
 
-  msg.channel.sendEmbed(
+  msg.channel.send({
     embed,
-    { disableEveryone: true }
-  );
+  });
 }, 2000);
 },
   '/undo' : (msg) => {
-    var user, id;
+    var user, id, flag;
+    if (msg.content === 'undo') flag = false;
+    else flag = true;
     try {
     user = msg.mentions.users.first;
     id = msg.mentions.users.first().id;
   } catch (e) {
-    if (!user || !id) return msg.channel.sendMessage("Please specify the member you want to clear their last reputation change.");
+    if (!user || !id) return msg.channel.send("Please specify the member you want to clear their last reputation change.");
   }
     var _flag = false;
    msg.member.roles.filter( (role) => {
@@ -123,7 +159,7 @@ const commands = {
         _flag = true;
       }});
 
-      if (_flag === false) return msg.channel.sendMessage("You do not have permission to issue this command!");
+      if (_flag === false) return msg.channel.send("You do not have permission to issue this command!");
       //console.log(id);
       var dir = ("./users/" + id + ".json");
       var dirobj = require(dir);
@@ -146,14 +182,18 @@ const commands = {
         if (err) return console.error(err);
         console.log(JSON.stringify(dirobj, null, 2));
       });
-
-      showData(msg, user, 'check');
+      if (flag === false)showData(msg, user, 'check');
+  },
+  'sudo' : (msg) => {
+  //  if (msg.author.id != 197733648403791872) return msg.channel.send("Sudo Commands limited to bot owner only.");
+    if (sudo.hasOwnProperty(msg.content.split(" ")[1])) return sudo[msg.content.split(" ")[1]](msg);
   }
 };
 bot.on('ready', () => {
   console.log("READY!");
 });
 bot.on('message', (msg) => {
+
   // Gets message content, split it, then take in the first keyword and checks if it's valid.
   if (commands.hasOwnProperty(msg.content.split(" ")[0])) return commands[msg.content.split(" ")[0]](msg);
 });
@@ -170,7 +210,7 @@ bot.on('guildMemberAdd', (member) => {
       if (err) throw err;
       console.log(JSON.stringify(data, null, 2));
     });
-    // bot.channels.get("297408095137562625").sendMessage(`${member}, your data have been saved. Welcome!`);
+    bot.channels.get("297408095137562625").send(`${member}, your data have been saved. Welcome!`);
 });
 
 function showData(msg, user, type){
@@ -197,11 +237,13 @@ function showData(msg, user, type){
   .addField('Percentage', (`${perc}%`));
 //slice((file.feedback.length <= 5) ? 0 : file.feedback.length - 5)
 // Current array length: 6. n - x = 5
-  msg.channel.sendEmbed(
-    embed,
-    { disableEveryone: true }
-  );
+  msg.channel.send({
+    embed
+  });
 }
 function round(value, decimals) {
   return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
+function isInt(value) {
+  return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value));
 }
