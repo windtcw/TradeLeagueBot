@@ -19,29 +19,8 @@ fs = require('fs'),
 datadir = "./users";
 // )
 
-bot.login('MzA2NTYwODk1NTA3NjI4MDQy.C-Fimg.6Ckvl7SCiBSUK8SNHIITJruDQpc');
+bot.login('MzA2NTYwODk1NTA3NjI4MDQy.C_jGxQ.FRICrvGnoleCdCT5sACb3AMJqg8');
 
-const sudo = {
-  '--massundo' : (m) => {
-    var _flag = false;
-    m.member.roles.filter( (role) => {
-      console.log(role.name);
-      if(role.name == "Staff member"){
-        _flag = true;
-      }});
-    if (_flag == false) return m.channel.send("Sudo Commands limited to Staffs only.");
-    
-    let user = m.mentions.users.first();
-    if (!user) return m.channel.send("Please specify the target user by a mention.");
-    let arr = m.content.split(" ").slice(3);
-    if (!arr) return m.channel.send("Please specify the amount of undos");
-    if (isInt(arr) === false) return m.channel.send("That's not an integer.");
-    for (var i = 0; i < arr; i++){
-    commands['/undo'](m);
-  }
-    showData(m, user, 'check');
-  }
-};
 const commands = {
   '+rep' : (msg) => {
     try{
@@ -184,9 +163,79 @@ const commands = {
       });
       if (flag === false)showData(msg, user, 'check');
   },
-  'sudo' : (msg) => {
-  //  if (msg.author.id != 197733648403791872) return msg.channel.send("Sudo Commands limited to bot owner only.");
-    if (sudo.hasOwnProperty(msg.content.split(" ")[1])) return sudo[msg.content.split(" ")[1]](msg);
+  '/massundo' : (m) => {
+    var _flag = false;
+    m.member.roles.filter( (role) => {
+      console.log(role.name);
+      if(role.name == "Staff member"){
+        _flag = true;
+      }});
+    if (_flag == false) return m.channel.send("Sudo Commands are limited to Staffs only.");
+
+    let user = m.mentions.users.first();
+    if (!user) return m.channel.send("Please specify the target user by a mention.");
+    let arr = m.content.split(" ").slice(2);
+    if (!arr) return m.channel.send("Please specify the amount of undos");
+    if (isInt(arr) === false) return m.channel.send("That's not an integer.");
+    for (var i = 0; i < arr; i++){
+    commands['/undo'](m);
+  }
+    showData(m, user, 'check');
+  },
+  '/mute' : (m) => {
+    // Syntax: staff --mute @mention [time in minutes] [reason]
+      var _flag = false;
+      m.member.roles.filter( (role) => {
+        console.log(role.name);
+        if(role.name == "Staff member"){
+          _flag = true;
+        }});
+      if (_flag == false) return m.channel.send("Staff Commands are limited to Staffs only.");
+
+      let user = m.mentions.users.first();
+      if (!user) return m.channel.send("Please specify the target user by a mention.");
+
+      let arr = m.content.split(" ").slice(2);
+      if (arr[0] && isInt(arr[0]) === false) return m.channel.send("That's not an integer.");
+
+
+      let time = (arr[0]) ? (arr[0] * 60000) : 300000;
+      console.log(time);
+      let reason = (arr[1]) ? arr.join(" ").split(" ").slice(1).join(" ") : "No reason specified";
+      console.log(4);
+      let id = user.id;
+      m.guild.fetchMember(id).then((member) => {
+        console.log(5);
+        m.guild.roles.filter( role => {
+
+          if(role.name.toLowerCase() == "muted"){
+            member.addRole(role).then( () => {
+              console.log(6);
+              let embed = new Discord.RichEmbed()
+
+              .setTitle('Mute report!')
+              //.addField('\u200b', '\u200b', true)
+              .setColor(0xff7700)
+              .setTimestamp()
+              .addField('Recipient', (`{member.user.tag}`))
+              .addField('Time muted', (`${time / 60000} minutes.`))
+              .addField('Reason', (reason))
+              .addField('Issuer', (`${m.author.tag}`));
+
+              bot.channels.get('313005765184978954').send({embed});
+
+              setTimeout(function(){
+                m.guild.fetchMember(id).then((member) => {
+                  m.guild.roles.filter( role => {
+                    if(role.name == "Muted"){
+                      member.removeRole(role).then(() => console.log('done'));
+                    }});
+              });
+            }, time);
+          });
+        }
+      });
+    });
   }
 };
 bot.on('ready', () => {
@@ -210,7 +259,7 @@ bot.on('guildMemberAdd', (member) => {
       if (err) throw err;
       console.log(JSON.stringify(data, null, 2));
     });
-    bot.channels.get("297408095137562625").send(`${member}, your data have been saved. Welcome!`);
+  //  bot.channels.get("297408095137562625").send(`${member}, your data have been saved. Welcome!`);
 });
 
 function showData(msg, user, type){
