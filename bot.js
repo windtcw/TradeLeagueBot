@@ -217,7 +217,7 @@ const commands = {
               //.addField('\u200b', '\u200b', true)
               .setColor(0xff7700)
               .setTimestamp()
-              .addField('Recipient', (`{member.user.tag}`))
+              .addField('Recipient', (`${member.user.tag}`))
               .addField('Time muted', (`${time / 60000} minutes.`))
               .addField('Reason', (reason))
               .addField('Issuer', (`${m.author.tag}`));
