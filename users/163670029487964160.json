@@ -1,12 +1,26 @@
 {
   "name": "Legacyy",
-  "plus": 0,
+  "plus": 2,
   "minus": 0,
   "feedback": [
     ".",
     ".",
     ".",
     ".",
-    "."
+    ".",
+    "this is a local tet",
+    "this is a local test"
+  ],
+  "last": [
+    "plus",
+    "plus"
+  ]
+}    "plus",
+    "plus",
+    "plus"
+  ]
+}    "plus",
+    "plus",
+    "plus"
   ]
 }

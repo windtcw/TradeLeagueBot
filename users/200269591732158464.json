@@ -1,12 +1,16 @@
 {
   "name": "Yoavier",
-  "plus": 0,
+  "plus": 1,
   "minus": 0,
   "feedback": [
     ".",
     ".",
     ".",
     ".",
-    "."
+    ".",
+    "test"
+  ],
+  "last": [
+    "plus"
   ]
 }
