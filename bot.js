@@ -182,6 +182,36 @@ const commands = {
   }
     showData(m, user, 'check');
   },
+  '/unmute' : (m) => {
+      var _flag = false;
+      m.member.roles.filter( (role) => {
+      console.log(role.name);
+      if(role.name == "Staff member"){
+        _flag = true;
+      }});
+    if (_flag == false) return m.channel.send("Staff Commands are limited to Staffs only.");
+
+      let user = m.mentions.users.first();
+      if (!user) return m.channel.send("Please specify the target user by a mention.");
+      let id = user.id;
+      m.guild.fetchMember(id).then((member) => {
+      m.guild.roles.filter( role => {
+        if(role.name == "Muted"){
+          member.removeRole(role).then(() => console.log('done'));
+        }});
+      let embed = new Discord.RichEmbed()
+
+      .setTitle('Moderator Action: Mute.')
+      //.addField('\u200b', '\u200b', true)
+      .setColor(0xff7700)
+      .setTimestamp()
+      .addField('User', (`${member.user.tag}`), true)
+      .addField('Moderator Responsible', (`${m.author.tag}`), true);
+
+      bot.channels.get('313005765184978954').send({embed});
+  });
+
+},
   '/mute' : (m) => {
     // Syntax: staff --mute @mention [time in minutes] [reason]
       var _flag = false;
@@ -198,34 +228,34 @@ const commands = {
       let arr = m.content.split(" ").slice(2);
       time = ((arr[0]) && isInt(arr[0])) ? (arr[0] * 60000) : 300000;
       console.log(time);
-      let reason = function(){
+      let reason = (function(){
         // /mute @mention
         if (!(arr[0])) return "No reason specified";
         if ((!isInt(arr[0]) && (arr[0]))) return arr.join(" ");
         else return (arr[1]) ? arr.join(" ").split(" ").slice(1).join(" ") : "No reason specified";
-      };
-      console.log(4);
+      })();
+      //console.log(4);
       let id = user.id;
       m.guild.fetchMember(id).then((member) => {
-        console.log(5);
+        //console.log(5);
         m.guild.roles.filter( role => {
 
           if(role.name.toLowerCase() == "muted"){
             member.addRole(role).then( () => {
-              console.log(6);
+              //console.log(6);
               let embed = new Discord.RichEmbed()
 
-              .setTitle('Mute report!')
+              .setTitle('Moderator Action: Mute.')
               //.addField('\u200b', '\u200b', true)
               .setColor(0xff7700)
               .setTimestamp()
-              .addField('Recipient', (`${member.user.tag}`))
-              .addField('Time muted', (`${time / 60000} minutes.`))
-              .addField('Reason', (reason))
-              .addField('Issuer', (`${m.author.tag}`));
+              .addField('User', (`${member.user.tag}`), true)
+              .addField('Time muted', (`${time / 60000} minutes.`), true)
+              .addField('Reason', (reason), true)
+              .addField('Moderator Responsible', (`${m.author.tag}`), true);
 
               bot.channels.get('313005765184978954').send({embed});
-
+              try{
               setTimeout(function(){
                 m.guild.fetchMember(id).then((member) => {
                   m.guild.roles.filter( role => {
@@ -234,11 +264,85 @@ const commands = {
                     }});
               });
             }, time);
+          } catch (e) {
+            console.log(e);
+          }
           });
         }
       });
     });
-  }
+  },
+  '/ban' : (m) => {
+    var _flag = false;
+    m.member.roles.filter( (role) => {
+      console.log(role.name);
+      if(role.name == "Staff member"){
+        _flag = true;
+      }});
+    if (_flag == false) return m.channel.send("Staff Commands are limited to Staffs only.");
+
+
+    let user = m.mentions.users.first();
+    if (!user) return m.channel.send("Please specify the target user by a mention.");
+    let id = user.id;
+
+    let reason = (m.content.split(" ").slice(2).join(" ")) ? (m.content.split(" ").slice(2).join(" ")) : "Unspecified.";
+
+    let query = new Discord.RichEmbed()
+
+    // .setTitle('Are you sure? | Ban')
+    .setAuthor('Are you sure? | Ban', bot.user.avatarURL)
+    .setThumbnail(`${user.avatarURL}`)
+    .setTimeStamp()
+    .setColor(0x0000ff)
+    .addField('User', (`${user.tag}`), true)
+    .addField('Moderator Responsible', (`${m.author.tag}`), true)
+    .addField('Reason', reason, true)
+    .setFooter("Type y to confirm ban. Anything else to cancel.");
+
+    m.channel.send({embed: query});
+    const collector = m.channel.createCollector(m => m);
+
+    collector.on('collect',(msg) => {
+
+      if (msg.content.toLowerCase === 'y'){
+        var _flag = false;
+        m.member.roles.filter( (role) => {
+          console.log(role.name);
+          if(role.name == "Staff member"){
+            _flag = true;
+          }});
+        }
+        if (_flag === false) return;
+      if (_flag === true) {
+        m.guild.fetchMember(id).then((member) => {
+        member.ban(reason);
+        let embed = new Discord.RichEmbed()
+        .setAuthor('Moderator Action: Ban', msg.author.avatarURL)
+        .setThumbnail(`${user.avatarURL}`)
+        .setColor(0xff0000)
+        .setTimeStamp()
+        .addField('User', (`${user.tag}`), true)
+        .addField('Moderator Responsible', (`${m.author.tag}`), true)
+        .addField('Reason', reason, true)
+        .setFooter("Do not break the rules. Else you'll end up like this.");
+        bot.channels.get('313005765184978954').send({embed});
+
+        embed = new Discord.RichEmbed()
+        .setAuthor('Oops, you have been banned!', msg.author.avatarURL)
+        .setThumbnail(`${user.avatarURL}`)
+        .setColor(0xff0000)
+        .setTimeStamp()
+        .addField('User', (`${user.tag}`), true)
+        .addField('Moderator Responsible', (`${m.author.tag}`), true)
+        .addField('Reason', reason, true)
+        .setFooter("Too bad for you!");
+        user.send({embed});
+      });
+    } else m.channel.send("Action canceled.");
+    collector.stop();
+  });
+ }
 };
 bot.on('ready', () => {
   console.log("READY!");
@@ -275,7 +379,7 @@ function showData(msg, user, type){
   var embed = new Discord.RichEmbed()
 
   .setTitle('Showing data.')
-  //.addField('\u200b', '\u200b', true)
+  .setThumbnail(user.avatarURL)
   .setColor(color)
   .setTimestamp()
   // array - x = 5
@@ -285,7 +389,7 @@ function showData(msg, user, type){
 \"${file.feedback.slice((file.feedback.length <= 10) ? 5 : 5 + ((file.feedback.length - 5) - 5)).join("\"\n\"")}\"
 \`\`\``))
   .addField('Point Count', (`+${file["plus"]} : -${file["minus"]}`))
-  .addField('Percentage', (`${perc}%`));
+  .addField('Percentage', (`${perc}%`), true);
 //slice((file.feedback.length <= 5) ? 0 : file.feedback.length - 5)
 // Current array length: 6. n - x = 5
   msg.channel.send({
