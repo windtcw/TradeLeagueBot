@@ -201,9 +201,9 @@ const commands = {
         }});
       let embed = new Discord.RichEmbed()
 
-      .setTitle('Moderator Action: Mute.')
+      .setTitle('Moderator Action: Unmute.')
       //.addField('\u200b', '\u200b', true)
-      .setColor(0xff7700)
+      .setColor(0xff0077)
       .setTimestamp()
       .addField('User', (`${member.user.tag}`), true)
       .addField('Moderator Responsible', (`${m.author.tag}`), true);
