@@ -342,7 +342,117 @@ const commands = {
     } else m.channel.send("Action canceled.");
     collector.stop();
   });
- }
+},
+ '!allrep' : (m) => {
+   var _flag = false;
+   m.member.roles.filter( (role) => {
+     console.log(role.name);
+     if(role.name == "Staff member"){
+       _flag = true;
+     }});
+   if (_flag == false) return m.channel.send("Staff Commands are limited to Staffs only.");
+
+   let user = m.mentions.users.first();
+   if (!user) return m.channel.send("Please specify the target user by a mention.");
+   let id = user.id;
+
+   var dir = (`./users/${user.id}.json`);
+   var file = require(dir);
+   var array = file.feedback.slice(5);
+   var content = (`
+Username : ${user.tag}
+Total Positive Reputation: ${file.plus}
+Total Negative Reputation: ${file.minus}
+Feedbacks:
+  ${array.join("\n\t")}
+`);
+
+  fs.writeFile('./log.txt', content, (err) => {
+    if (err) throw err;
+  });
+
+  m.author.send({
+    files: ["./log.txt"]
+  });
+},
+'/softban' : (m) => {
+  var _flag = false;
+  m.member.roles.filter( (role) => {
+    console.log(role.name);
+    if(role.name == "Staff member"){
+      _flag = true;
+    }});
+  if (_flag == false) return m.channel.send("Staff Commands are limited to Staffs only.");
+
+
+  let user = m.mentions.users.first();
+  if (!user) return m.channel.send("Please specify the target user by a mention.");
+  let id = user.id;
+
+  let reason = (m.content.split(" ").slice(2).join(" ")) ? (m.content.split(" ").slice(2).join(" ")) : "Unspecified.";
+
+  let query = new Discord.RichEmbed()
+
+  // .setTitle('Are you sure? | Ban')
+  .setAuthor('Are you sure? | Ban', bot.user.avatarURL)
+  .setThumbnail(`${user.avatarURL}`)
+  .setTimeStamp()
+  .setColor(0x0000ff)
+  .addField('User', (`${user.tag}`), true)
+  .addField('Moderator Responsible', (`${m.author.tag}`), true)
+  .addField('Reason', reason, true)
+  .setFooter("Type y to confirm ban. Anything else to cancel.");
+
+  m.channel.send({embed: query});
+  const collector = m.channel.createCollector(m => m);
+
+  collector.on('collect',(msg) => {
+
+    if (msg.content.toLowerCase === 'y'){
+      var _flag = false;
+      m.member.roles.filter( (role) => {
+        console.log(role.name);
+        if(role.name == "Staff member"){
+          _flag = true;
+        }});
+      }
+      if (_flag === false) return;
+    if (_flag === true) {
+      m.guild.fetchMember(id).then((member) => {
+      member.ban({
+        days: 7,
+        reason: reason}).then((gmember) => {
+        setTimeout(function(gmember){
+          var id = gmember.user.id;
+          m.guild.unban(id);
+        });
+      });
+      let embed = new Discord.RichEmbed()
+      .setAuthor('Moderator Action: Softban', msg.author.avatarURL)
+      .setThumbnail(`${user.avatarURL}`)
+      .setColor(0xffdd00)
+      .setTimeStamp()
+      .addField('User', (`${user.tag}`), true)
+      .addField('Moderator Responsible', (`${m.author.tag}`), true)
+      .addField('Reason', reason, true)
+      .setFooter("Softbanning is a combination of banning and unbanning in a short amount of time.");
+      bot.channels.get('313005765184978954').send({embed});
+
+      embed = new Discord.RichEmbed()
+      .setAuthor('Oops, you have been softbanned!', msg.author.avatarURL)
+      .setThumbnail(`${user.avatarURL}`)
+      .setColor(0xffdd00)
+      .setTimeStamp()
+      .addField('User', (`${user.tag}`), true)
+      .addField('Moderator Responsible', (`${m.author.tag}`), true)
+      .addField('Reason', reason, true)
+      .setFooter("Don't worry! You can still join back to the server using a valid invite link.");
+      user.send({embed});
+    });
+  } else m.channel.send("Action canceled.");
+  collector.stop();
+});
+}
 };
 bot.on('ready', () => {
   console.log("READY!");
