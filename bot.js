@@ -425,7 +425,7 @@ Feedbacks:
         setTimeout(function(gmember){
           var id = gmember.user.id;
           m.guild.unban(id);
-        });
+        }, 20);
       });
       let embed = new Discord.RichEmbed()
       .setAuthor('Moderator Action: Softban', msg.author.avatarURL)
