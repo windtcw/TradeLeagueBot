@@ -19,7 +19,7 @@ fs = require('fs'),
 datadir = "./users";
 // )
 
-bot.login('TOKEN GOES HERE');
+bot.login('MzA2NTYwODk1NTA3NjI4MDQy.DEFJRw.HWt9BAJEKqpJGx7pbZiHZlD-hbA');
 
 const commands = {
   '+rep' : (msg) => {
@@ -30,7 +30,7 @@ const commands = {
     if (!feedback) feedback = "None.";
 
     let user = msg.mentions.users.first();
-    if (user.id == msg.author.id) return msg.channel.send(`${msg.author}, you can't add a reputation point to yourself.`);
+      if (user.id == msg.author.id) return msg.channel.send(`${msg.author}, you can't add a reputation point to yourself.`);
       var file = require("./users/" + user.id + ".json");
       console.log(file);
       file["plus"] = file["plus"] + 1;
@@ -85,17 +85,18 @@ const commands = {
     if (msg.author.id != 197733648403791872) return msg.channel.send("Command limited to bot owner only.");
     msg.guild.fetchMembers().then((guild) => {
       var arr = guild.members.keyArray();
+      var olddata = require(`./user/${arr[i]}.json`)
       var p = ".";
       var keyarr = guild.members.array();
       for (i = 0; i < arr.length; i++){
-        var data = {
+        /*var data = {
           "name" : (`${keyarr[i].user.username}`),
           "plus" : 0,
           "minus" : 0,
           "feedback" : [p,p,p,p,p],
           "last" : []
-        };
-        fs.writeFile((`./users/${arr[i]}.json`), JSON.stringify(data, null, 2), (err) => {
+        };**/
+        fs.writeFile((`./users/${msg.guild.id}/${arr[i]}.json`), JSON.stringify(olddata, null, 2), (err) => {
           if (err) throw err;
           console.log(JSON.stringify(data, null, 2));
         });
@@ -272,7 +273,7 @@ const commands = {
       });
     });
   },
-  '/ban' : (m) => {
+  /*'/ban' : (m) => {
     var _flag = false;
     m.member.roles.filter( (role) => {
       console.log(role.name);
@@ -292,21 +293,28 @@ const commands = {
 
     // .setTitle('Are you sure? | Ban')
     .setAuthor('Are you sure? | Ban', bot.user.avatarURL)
-    .setThumbnail(`${user.avatarURL}`)
-    .setTimeStamp()
+    //.setThumbnail(`${user.avatarURL}`)
     .setColor(0x0000ff)
     .addField('User', (`${user.tag}`), true)
     .addField('Moderator Responsible', (`${m.author.tag}`), true)
     .addField('Reason', reason, true)
-    .setFooter("Type y to confirm ban. Anything else to cancel.");
+    .setFooter("Type y to confirm ban. Anything else to cancel.")
+    .setTimestamp();
+    
 
     m.channel.send({embed: query});
-    const collector = m.channel.createCollector(m => m);
-
-    collector.on('collect',(msg) => {
-
-      if (msg.content.toLowerCase === 'y'){
-        var _flag = false;
+    
+      const collector = m.channel.createCollector(m => m);
+    
+      var _flag = false;
+      let i = 0;
+    collector.on('collect', (mesg) => {
+      if (i == 0) {
+      i++;
+      return;
+    }
+      if (mesg.content.toLowerCase === 'y'){
+        
         m.member.roles.filter( (role) => {
           console.log(role.name);
           if(role.name == "Staff member"){
@@ -318,21 +326,21 @@ const commands = {
         m.guild.fetchMember(id).then((member) => {
         member.ban(reason);
         let embed = new Discord.RichEmbed()
-        .setAuthor('Moderator Action: Ban', msg.author.avatarURL)
+        .setAuthor('Moderator Action: Ban', mesg.author.avatarURL)
         .setThumbnail(`${user.avatarURL}`)
         .setColor(0xff0000)
-        .setTimeStamp()
+        .setTimestamp()
         .addField('User', (`${user.tag}`), true)
         .addField('Moderator Responsible', (`${m.author.tag}`), true)
         .addField('Reason', reason, true)
         .setFooter("Do not break the rules. Else you'll end up like this.");
-        bot.channels.get('313005765184978954').send({embed});
+        bot.channels.get('332194412161400844').send({embed});
 
         embed = new Discord.RichEmbed()
-        .setAuthor('Oops, you have been banned!', msg.author.avatarURL)
+        .setAuthor('Oops, you have been banned!', mesg.author.avatarURL)
         .setThumbnail(`${user.avatarURL}`)
         .setColor(0xff0000)
-        .setTimeStamp()
+        .setTimestamp()
         .addField('User', (`${user.tag}`), true)
         .addField('Moderator Responsible', (`${m.author.tag}`), true)
         .addField('Reason', reason, true)
@@ -344,7 +352,7 @@ const commands = {
   });
 },
  '!allrep' : (m) => {
-   var _flag = false;
+  var _flag = false;
    m.member.roles.filter( (role) => {
      console.log(role.name);
      if(role.name == "Staff member"){
@@ -360,10 +368,10 @@ const commands = {
    var file = require(dir);
    var array = file.feedback.slice(5);
    var content = (`
-Username : ${user.tag}
-Total Positive Reputation: ${file.plus}
-Total Negative Reputation: ${file.minus}
-Feedbacks:
+Username : ${user.tag}\n
+Total Positive Reputation: ${file.plus}\n
+Total Negative Reputation: ${file.minus}\n
+Feedbacks:\n
   ${array.join("\n\t")}
 `);
 
@@ -394,9 +402,9 @@ Feedbacks:
   let query = new Discord.RichEmbed()
 
   // .setTitle('Are you sure? | Ban')
-  .setAuthor('Are you sure? | Ban', bot.user.avatarURL)
-  .setThumbnail(`${user.avatarURL}`)
-  .setTimeStamp()
+  .setAuthor('Are you sure? | Softban', bot.user.avatarURL)
+  //.setThumbnail(`${user.avatarURL}`)
+  .setTimestamp()
   .setColor(0x0000ff)
   .addField('User', (`${user.tag}`), true)
   .addField('Moderator Responsible', (`${m.author.tag}`), true)
@@ -404,12 +412,18 @@ Feedbacks:
   .setFooter("Type y to confirm ban. Anything else to cancel.");
 
   m.channel.send({embed: query});
+  
+  var _flag = false;
+  let i = 0;
   const collector = m.channel.createCollector(m => m);
-
-  collector.on('collect',(msg) => {
-
+  collector.on('collect', (msg) => {
+    if (i == 0) {
+      i++;
+      return;
+    }
+    console.log("collector on");
     if (msg.content.toLowerCase === 'y'){
-      var _flag = false;
+      
       m.member.roles.filter( (role) => {
         console.log(role.name);
         if(role.name == "Staff member"){
@@ -431,7 +445,7 @@ Feedbacks:
       .setAuthor('Moderator Action: Softban', msg.author.avatarURL)
       .setThumbnail(`${user.avatarURL}`)
       .setColor(0xffdd00)
-      .setTimeStamp()
+      .setTimestamp()
       .addField('User', (`${user.tag}`), true)
       .addField('Moderator Responsible', (`${m.author.tag}`), true)
       .addField('Reason', reason, true)
@@ -442,7 +456,7 @@ Feedbacks:
       .setAuthor('Oops, you have been softbanned!', msg.author.avatarURL)
       .setThumbnail(`${user.avatarURL}`)
       .setColor(0xffdd00)
-      .setTimeStamp()
+      .setTimestamp()
       .addField('User', (`${user.tag}`), true)
       .addField('Moderator Responsible', (`${m.author.tag}`), true)
       .addField('Reason', reason, true)
@@ -452,13 +466,13 @@ Feedbacks:
   } else m.channel.send("Action canceled.");
   collector.stop();
 });
-}
+}*/
 };
 bot.on('ready', () => {
   console.log("READY!");
 });
 bot.on('message', (msg) => {
-
+  if (msg.guild.id != '297408095137562625') return;
   // Gets message content, split it, then take in the first keyword and checks if it's valid.
   if (commands.hasOwnProperty(msg.content.split(" ")[0])) return commands[msg.content.split(" ")[0]](msg);
 });
@@ -471,7 +485,7 @@ bot.on('guildMemberAdd', (member) => {
       "feedback" : [p,p,p,p,p],
       "last" : []
     };
-    fs.writeFile((`./users/${member.id}.json`), JSON.stringify(data, null, 2), (err) => {
+    fs.writeFile((`./users/${member.guild.id}/${member.id}.json`), JSON.stringify(data, null, 2), (err) => {
       if (err) throw err;
       console.log(JSON.stringify(data, null, 2));
     });
