@@ -527,6 +527,32 @@ Feedbacks:\n
       }
       msg.channel.send(sendArr[0]);
       });          
+  },
+    r : (msg) => {
+    let result = [];
+    let arr = msg.content.split(" ").slice(1)[0];
+    if (!arr) return msg.channel.send("There is no input!");
+    else {
+      if (arr.includes('d')) {
+        let array = arr.split("d");
+        let n1 = array[0],
+        n2 = array[1];
+        var res = 0;
+
+        if (!isInt(n1) || !isInt(n2)) return msg.channel.send("This roll is impossible!");
+
+        for (let i = 0; i < n1; i++){
+          let q = randomInt(1,n2);
+          result.push(q);
+          res = res + q;
+        }
+      } else {
+        let q = randomInt(1,arr);
+        result.push(q);
+        res = q;
+      }
+      msg.channel.send(`Rolled: [**${result.join(", ")}**] Total: [**${res}**]`);
+    }
   }
 };
 bot.on('ready', () => {
