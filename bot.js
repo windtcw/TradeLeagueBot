@@ -350,7 +350,7 @@ const commands = {
     } else m.channel.send("Action canceled.");
     collector.stop();
   });
-},
+},**/
  '!allrep' : (m) => {
   var _flag = false;
    m.member.roles.filter( (role) => {
@@ -383,6 +383,7 @@ Feedbacks:\n
     files: ["./log.txt"]
   });
 },
+/*
 '/softban' : (m) => {
   var _flag = false;
   m.member.roles.filter( (role) => {
@@ -467,6 +468,66 @@ Feedbacks:\n
   collector.stop();
 });
 }*/
+  allinvites : (msg, lang, bot) => {
+    var _flag = false;
+      msg.member.roles.filter( (role) => {
+      console.log(role.name);
+      if(role.name == "Staff member"){
+        _flag = true;
+      }});
+      if (_flag == false) return msg.channel.send("Staff Commands are limited to Staffs only.");
+
+    console.log("1");
+     bot.guilds.get('297408095137562625').fetchInvites().then((invites) => {
+      let keyArr = invites.array();
+      var Arr = [], sendArr = [];
+      for (let i = 0; i < keyArr.length; i++){
+        if (keyArr[i].channel.id != 335085483325652993) return msg.channel.send("This invite doesn't link to the <#335085483325652993> channel. Thus, it's invalid");
+        Arr.push({
+          creator: keyArr[i].inviter.tag,
+          code: keyArr[i].code,
+          uses: keyArr[i].uses
+        });
+        console.log(Arr[i].uses);
+      }
+      console.log(Arr);
+      bubbleSort(Arr);
+      for (let i = 0; i < Arr.length; i++){
+        sendArr.push(`${Arr[i].creator} ; ${Arr[i].code} : ${Arr[i].uses} uses`);
+      }
+      console.log(Arr);
+      fs.writeFile('./allinv.txt', sendArr.join("\n"), (err) => {
+        if (err) console.log(err);
+      });      
+    });
+  msg.author.send({
+    files: ['./allinv.txt']
+  });  
+  },
+  invitecount : (msg, lang, bot) => {
+
+    let inv = msg.content.split(" ").slice(1)[0].split("https://discord.gg/")[1];
+    bot.guilds.get('297408095137562625').fetchInvites().then((invites) => {
+      let keyArr = invites.array();
+      var Arr = [], sendArr = [];
+      for (let i = 0; i < keyArr.length; i++){
+        if (keyArr[i].channel.id != 335085483325652993) return msg.channel.send("This invite doesn't link to the <#335085483325652993> channel. Thus, it's invalid");
+        if (keyArr[i].code != inv) continue;
+        
+        console.log(keyArr[i].uses);
+        
+        Arr.push({
+          creator: keyArr[i].inviter.tag,
+          code: keyArr[i].code,
+          uses: keyArr[i].uses
+        });
+        console.log(Arr[0].uses);
+      
+        sendArr.push(`${Arr[0].creator} ; ${Arr[0].code} : ${Arr[0].uses} uses`);
+      }
+      msg.channel.send(sendArr[0]);
+      });          
+  }
 };
 bot.on('ready', () => {
   console.log("READY!");
@@ -474,7 +535,7 @@ bot.on('ready', () => {
 bot.on('message', (msg) => {
   if (msg.guild.id != '297408095137562625') return;
   // Gets message content, split it, then take in the first keyword and checks if it's valid.
-  if (commands.hasOwnProperty(msg.content.split(" ")[0])) return commands[msg.content.split(" ")[0]](msg);
+  if (commands.hasOwnProperty(msg.content.split(" ")[0])) return commands[msg.content.split(" ")[0]](msg, bot);
 });
 bot.on('guildMemberAdd', (member) => {
   var p = ".";
