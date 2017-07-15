@@ -468,7 +468,7 @@ Feedbacks:\n
   collector.stop();
 });
 }*/
-  allinvites : (msg, lang, bot) => {
+  "/allinvites" : (msg, lang, bot) => {
     var _flag = false;
       msg.member.roles.filter( (role) => {
       console.log(role.name);
@@ -504,7 +504,7 @@ Feedbacks:\n
     files: ['./allinv.txt']
   });  
   },
-  invitecount : (msg, lang, bot) => {
+  "/invitecount" : (msg, lang, bot) => {
 
     let inv = msg.content.split(" ").slice(1)[0].split("https://discord.gg/")[1];
     bot.guilds.get('297408095137562625').fetchInvites().then((invites) => {
@@ -528,7 +528,7 @@ Feedbacks:\n
       msg.channel.send(sendArr[0]);
       });          
   },
-    r : (msg) => {
+    "/r" : (msg) => {
     let result = [];
     let arr = msg.content.split(" ").slice(1)[0];
     if (!arr) return msg.channel.send("There is no input!");
