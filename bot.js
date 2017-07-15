@@ -482,7 +482,7 @@ Feedbacks:\n
       let keyArr = invites.array();
       var Arr = [], sendArr = [];
       for (let i = 0; i < keyArr.length; i++){
-        if (keyArr[i].channel.id != 335085483325652993) return msg.channel.send("This invite doesn't link to the <#335085483325652993> channel. Thus, it's invalid");
+        if (keyArr[i].channel.id != 335085483325652993) continue;
         Arr.push({
           creator: keyArr[i].inviter.tag,
           code: keyArr[i].code,
