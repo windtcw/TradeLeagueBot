@@ -273,84 +273,7 @@ const commands = {
       });
     });
   },
-  /*'/ban' : (m) => {
-    var _flag = false;
-    m.member.roles.filter( (role) => {
-      console.log(role.name);
-      if(role.name == "Staff member"){
-        _flag = true;
-      }});
-    if (_flag == false) return m.channel.send("Staff Commands are limited to Staffs only.");
 
-
-    let user = m.mentions.users.first();
-    if (!user) return m.channel.send("Please specify the target user by a mention.");
-    let id = user.id;
-
-    let reason = (m.content.split(" ").slice(2).join(" ")) ? (m.content.split(" ").slice(2).join(" ")) : "Unspecified.";
-
-    let query = new Discord.RichEmbed()
-
-    // .setTitle('Are you sure? | Ban')
-    .setAuthor('Are you sure? | Ban', bot.user.avatarURL)
-    //.setThumbnail(`${user.avatarURL}`)
-    .setColor(0x0000ff)
-    .addField('User', (`${user.tag}`), true)
-    .addField('Moderator Responsible', (`${m.author.tag}`), true)
-    .addField('Reason', reason, true)
-    .setFooter("Type y to confirm ban. Anything else to cancel.")
-    .setTimestamp();
-    
-
-    m.channel.send({embed: query});
-    
-      const collector = m.channel.createCollector(m => m);
-    
-      var _flag = false;
-      let i = 0;
-    collector.on('collect', (mesg) => {
-      if (i == 0) {
-      i++;
-      return;
-    }
-      if (mesg.content.toLowerCase === 'y'){
-        
-        m.member.roles.filter( (role) => {
-          console.log(role.name);
-          if(role.name == "Staff member"){
-            _flag = true;
-          }});
-        }
-        if (_flag === false) return;
-      if (_flag === true) {
-        m.guild.fetchMember(id).then((member) => {
-        member.ban(reason);
-        let embed = new Discord.RichEmbed()
-        .setAuthor('Moderator Action: Ban', mesg.author.avatarURL)
-        .setThumbnail(`${user.avatarURL}`)
-        .setColor(0xff0000)
-        .setTimestamp()
-        .addField('User', (`${user.tag}`), true)
-        .addField('Moderator Responsible', (`${m.author.tag}`), true)
-        .addField('Reason', reason, true)
-        .setFooter("Do not break the rules. Else you'll end up like this.");
-        bot.channels.get('332194412161400844').send({embed});
-
-        embed = new Discord.RichEmbed()
-        .setAuthor('Oops, you have been banned!', mesg.author.avatarURL)
-        .setThumbnail(`${user.avatarURL}`)
-        .setColor(0xff0000)
-        .setTimestamp()
-        .addField('User', (`${user.tag}`), true)
-        .addField('Moderator Responsible', (`${m.author.tag}`), true)
-        .addField('Reason', reason, true)
-        .setFooter("Too bad for you!");
-        user.send({embed});
-      });
-    } else m.channel.send("Action canceled.");
-    collector.stop();
-  });
-},**/
  '!allrep' : (m) => {
   var _flag = false;
    m.member.roles.filter( (role) => {
@@ -383,91 +306,6 @@ Feedbacks:\n
     files: ["./log.txt"]
   });
 },
-/*
-'/softban' : (m) => {
-  var _flag = false;
-  m.member.roles.filter( (role) => {
-    console.log(role.name);
-    if(role.name == "Staff member"){
-      _flag = true;
-    }});
-  if (_flag == false) return m.channel.send("Staff Commands are limited to Staffs only.");
-
-
-  let user = m.mentions.users.first();
-  if (!user) return m.channel.send("Please specify the target user by a mention.");
-  let id = user.id;
-
-  let reason = (m.content.split(" ").slice(2).join(" ")) ? (m.content.split(" ").slice(2).join(" ")) : "Unspecified.";
-
-  let query = new Discord.RichEmbed()
-
-  // .setTitle('Are you sure? | Ban')
-  .setAuthor('Are you sure? | Softban', bot.user.avatarURL)
-  //.setThumbnail(`${user.avatarURL}`)
-  .setTimestamp()
-  .setColor(0x0000ff)
-  .addField('User', (`${user.tag}`), true)
-  .addField('Moderator Responsible', (`${m.author.tag}`), true)
-  .addField('Reason', reason, true)
-  .setFooter("Type y to confirm ban. Anything else to cancel.");
-
-  m.channel.send({embed: query});
-  
-  var _flag = false;
-  let i = 0;
-  const collector = m.channel.createCollector(m => m);
-  collector.on('collect', (msg) => {
-    if (i == 0) {
-      i++;
-      return;
-    }
-    console.log("collector on");
-    if (msg.content.toLowerCase === 'y'){
-      
-      m.member.roles.filter( (role) => {
-        console.log(role.name);
-        if(role.name == "Staff member"){
-          _flag = true;
-        }});
-      }
-      if (_flag === false) return;
-    if (_flag === true) {
-      m.guild.fetchMember(id).then((member) => {
-      member.ban({
-        days: 7,
-        reason: reason}).then((gmember) => {
-        setTimeout(function(gmember){
-          var id = gmember.user.id;
-          m.guild.unban(id);
-        }, 20);
-      });
-      let embed = new Discord.RichEmbed()
-      .setAuthor('Moderator Action: Softban', msg.author.avatarURL)
-      .setThumbnail(`${user.avatarURL}`)
-      .setColor(0xffdd00)
-      .setTimestamp()
-      .addField('User', (`${user.tag}`), true)
-      .addField('Moderator Responsible', (`${m.author.tag}`), true)
-      .addField('Reason', reason, true)
-      .setFooter("Softbanning is a combination of banning and unbanning in a short amount of time.");
-      bot.channels.get('313005765184978954').send({embed});
-
-      embed = new Discord.RichEmbed()
-      .setAuthor('Oops, you have been softbanned!', msg.author.avatarURL)
-      .setThumbnail(`${user.avatarURL}`)
-      .setColor(0xffdd00)
-      .setTimestamp()
-      .addField('User', (`${user.tag}`), true)
-      .addField('Moderator Responsible', (`${m.author.tag}`), true)
-      .addField('Reason', reason, true)
-      .setFooter("Don't worry! You can still join back to the server using a valid invite link.");
-      user.send({embed});
-    });
-  } else m.channel.send("Action canceled.");
-  collector.stop();
-});
-}*/
   "/allinvites" : (msg, lang, bot) => {
     var _flag = false;
       msg.member.roles.filter( (role) => {
@@ -505,14 +343,16 @@ Feedbacks:\n
   });  
   },
   "/invitecount" : (msg, lang, bot) => {
-
-    let inv = msg.content.split(" ").slice(1)[0].split("https://discord.gg/")[1];
+    let inv = msg.content.split(" ").slice(1)[0];
+    if (!inv) return;
+    inv = inv.split("https://discord.gg/")[1];
     bot.guilds.get('297408095137562625').fetchInvites().then((invites) => {
       let keyArr = invites.array();
       var Arr = [], sendArr = [];
       for (let i = 0; i < keyArr.length; i++){
-        if (keyArr[i].channel.id != 335085483325652993) return msg.channel.send("This invite doesn't link to the <#335085483325652993> channel. Thus, it's invalid");
+        
         if (keyArr[i].code != inv) continue;
+        if (keyArr[i].channel.id != 335085483325652993) return msg.channel.send("This invite doesn't link to the <#335085483325652993> channel. Thus, it's invalid");
         
         console.log(keyArr[i].uses);
         
@@ -523,7 +363,7 @@ Feedbacks:\n
         });
         console.log(Arr[0].uses);
       
-        sendArr.push(`${Arr[0].creator} ; ${Arr[0].code} : ${Arr[0].uses} uses`);
+        sendArr.push(`This invite from **${Arr[0].creator}** currently has **${Arr[0].uses}** uses`);
       }
       msg.channel.send(sendArr[0]);
       });          
@@ -561,7 +401,7 @@ bot.on('ready', () => {
 bot.on('message', (msg) => {
   if (msg.guild.id != '297408095137562625') return;
   // Gets message content, split it, then take in the first keyword and checks if it's valid.
-  if (commands.hasOwnProperty(msg.content.split(" ")[0])) return commands[msg.content.split(" ")[0]](msg, bot);
+  if (commands.hasOwnProperty(msg.content.split(" ")[0])) return commands[msg.content.split(" ")[0]](msg, bot, bot);
 });
 bot.on('guildMemberAdd', (member) => {
   var p = ".";
@@ -572,7 +412,7 @@ bot.on('guildMemberAdd', (member) => {
       "feedback" : [p,p,p,p,p],
       "last" : []
     };
-    fs.writeFile((`./users/${member.guild.id}/${member.id}.json`), JSON.stringify(data, null, 2), (err) => {
+    fs.writeFile((`./users/${member.id}.json`), JSON.stringify(data, null, 2), (err) => {
       if (err) throw err;
       console.log(JSON.stringify(data, null, 2));
     });
