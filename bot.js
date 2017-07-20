@@ -19,7 +19,7 @@ fs = require('fs'),
 datadir = "./users";
 // )
 
-bot.login('MzA2NTYwODk1NTA3NjI4MDQy.DEFJRw.HWt9BAJEKqpJGx7pbZiHZlD-hbA');
+bot.login('M....A');
 
 const commands = {
   '+rep' : (msg) => {
